@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn instance to serve babyphone
+After=network.target
+
+[Service]
+User=user
+Group=www-data
+WorkingDirectory=/home/pi/babyphone
+Environment="PATH=/home/pi/babyphone/venv/bin"
+ExecStart=/home/pi/babyphone/venv/bin/gunicorn --threads 5 --workers 1 --bind unix:babyphone.sock -m 007 app:app
+
+[Install]
+WantedBy=multi-user.target
