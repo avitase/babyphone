@@ -13,11 +13,12 @@ class Camera(BaseCamera):
             camera.framerate = 32
             camera.rotation = 180
 
-            warm_up_time_in_seconds = 2.
+            warm_up_time_in_seconds = .1
             time.sleep(warm_up_time_in_seconds)
 
             stream = io.BytesIO()
-            for _ in camera.capture_continuous(stream, 'jpeg',
+            for _ in camera.capture_continuous(stream,
+                                               'jpeg',
                                                use_video_port=True):
                 # return current frame
                 stream.seek(0)
