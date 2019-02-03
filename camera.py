@@ -1,14 +1,27 @@
+import io
 import time
+import picamera
 from base_camera import BaseCamera
 
 
 class Camera(BaseCamera):
-    """An emulated camera implementation that streams a repeated sequence of
-    files 1.jpg, 2.jpg and 3.jpg at a rate of one frame per second."""
-    imgs = [open(f + '.jpg', 'rb').read() for f in ['1', '2', '3']]
 
     @staticmethod
     def frames():
-        while True:
-            time.sleep(1)
-            yield Camera.imgs[int(time.time()) % 3]
+        with picamera.PiCamera() as camera:
+            camera.resolution = (640, 480)
+            camera.framerate = 32
+
+            warm_up_time_in_seconds = 2.
+            time.sleep(warm_up_time_in_seconds)
+
+            stream = io.BytesIO()
+            for _ in camera.capture_continuous(stream, 'jpeg',
+                                               use_video_port=True):
+                # return current frame
+                stream.seek(0)
+                yield stream.read()
+
+                # reset stream for next frame
+                stream.seek(0)
+                stream.truncate()
