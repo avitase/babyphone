@@ -11,6 +11,7 @@ class Camera(BaseCamera):
         with picamera.PiCamera() as camera:
             camera.resolution = (640, 480)
             camera.framerate = 32
+            camera.rotation = 180
 
             warm_up_time_in_seconds = 2.
             time.sleep(warm_up_time_in_seconds)
