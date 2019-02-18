@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import time
 from importlib import import_module
 
 from flask import Flask, render_template, Response
@@ -25,16 +26,28 @@ def index():
     return render_template('index.html')
 
 
-def generate_frame(camera):
+def generate_frame(camera, fps):
+    now = time.time()
+    t1 = now
+
     while True:
         frame = camera.get_frame()
+
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+        t2 = now
+        dt = 1. / float(fps) - (t2 - t1)
+        if dt > 0.:
+            time.sleep(dt)
+        t1 = now
 
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(generate_frame(Camera()),
+    default_FPS = 10
+    return Response(generate_frame(camera=Camera(),
+                                   fps=app.config.get('FPS', default_FPS)),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
