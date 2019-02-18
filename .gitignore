@@ -61,3 +61,6 @@ venv/
 
 # IDEA files
 .idea/
+
+# Flask config file (also contains secret key)
+settings.py

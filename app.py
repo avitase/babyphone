@@ -16,6 +16,9 @@ else:
 
 app = Flask(__name__)
 
+# Load settings from 'settings.py'
+app.config.from_object('settings')
+
 
 @app.route('/')
 def index():
