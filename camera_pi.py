@@ -2,6 +2,7 @@ import io
 import time
 
 import picamera
+from flask import current_app
 
 from base_camera import BaseCamera
 
@@ -10,8 +11,14 @@ class Camera(BaseCamera):
     @staticmethod
     def frames():
         with picamera.PiCamera() as camera:
-            # let camera warm up
+            camera = picamera.PiCamera()
+            camera.resolution = (640, 480)
+            camera.rotation = 180
+
+            log = current_app.logger.info
+            log('Warming up camera ...')
             time.sleep(2)
+            log('... done warming up camera.')
 
             stream = io.BytesIO()
             for _ in camera.capture_continuous(stream, 'jpeg',
