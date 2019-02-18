@@ -26,7 +26,7 @@ def index():
     return render_template('index.html')
 
 
-def gen(camera):
+def generate_frame(camera):
     """Video streaming generator function."""
     while True:
         frame = camera.get_frame()
@@ -37,7 +37,7 @@ def gen(camera):
 @app.route('/video_feed')
 def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
-    return Response(gen(Camera()),
+    return Response(generate_frame(Camera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
