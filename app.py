@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-from importlib import import_module
 import os
+from importlib import import_module
+
 from flask import Flask, render_template, Response
 
 # import camera driver
