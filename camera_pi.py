@@ -3,40 +3,32 @@ import io
 import time
 
 import picamera
-from flask import current_app
 
 from base_camera import BaseCamera
 
 
 class Camera(BaseCamera):
-    @staticmethod
-    def frames():
-        with picamera.PiCamera() as camera:
-            camera = picamera.PiCamera()
-            camera.resolution = (640, 480)
-            camera.rotation = 180
+    def __init__(self, socket):
+        super(Camera, self).__init__(socket)
 
-            camera.annotate_background = picamera.Color('black')
+        self._camera = picamera.PiCamera()
+        self._camera.resolution = (640, 480)
+        self._camera.rotation = 180
+        self._camera.annotate_background = picamera.Color('black')
 
-            get_timestamp = datetime.datetime.now().strftime('%H:%M:%S')
-            camera.annotate_text = get_timestamp
+        # give camera 2 seconds to configure
+        time.sleep(2)
 
-            log = current_app.logger.info
-            log('Warming up camera ...')
-            time.sleep(2)
-            log('... done warming up camera.')
+    def next_frame(self):
+        stream = io.BytesIO()
+        for _ in self._camera.capture_continuous(stream, 'jpeg', use_video_port=True):
+            # update timestamp
+            self._camera.annotate_text = datetime.datetime.now().strftime('%H:%M:%S')
 
-            stream = io.BytesIO()
-            for _ in camera.capture_continuous(stream, 'jpeg',
-                                               use_video_port=True):
+            # return current frame
+            stream.seek(0)
+            yield stream.read()
 
-                # udpate timestamp
-                camera.annotate_text = get_timestamp
-
-                # return current frame
-                stream.seek(0)
-                yield stream.read()
-
-                # reset stream for next frame
-                stream.seek(0)
-                stream.truncate()
+            # reset stream for next frame
+            stream.seek(0)
+            stream.truncate()
