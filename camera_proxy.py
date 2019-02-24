@@ -31,7 +31,7 @@ class CameraProxy(object):
         img = Image.open(io.BytesIO(self._socket.recv()))
         draw = ImageDraw.Draw(img)
         draw.text((10, 10),
-                  '{} ({:.0f} FPS)'.format(timestamp, fps_avg),
+                  '{}\n{:.0f} FPS'.format(timestamp, fps_avg),
                   (255, 106, 0),
                   font=self._font)
 
