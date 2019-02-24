@@ -10,8 +10,13 @@ class Camera(BaseCamera):
     def __init__(self, socket):
         super(Camera, self).__init__(socket)
 
+    def rnd_img(width, height):
+        vec = np.repeat(np.random.rand(width * height) * 255, 3)
+        return vec.reshape((width, height, 3))
+
+
     def next_frame(self):
-        pxl = np.random.rand(64, 48, 3) * 255
+        pxl = Camera.rnd_img(64, 48)
         img = Image.fromarray(pxl.astype('uint8')).convert('RGB')
         img = img.resize((640, 480))
 
