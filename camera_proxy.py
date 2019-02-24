@@ -26,14 +26,15 @@ class CameraProxy(object):
         self.last_update = now()
 
         timestamp = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        text = str(timestamp)
+
         fps_avg = sum(self.fps) / len(self.fps)
+        if len(self.fps) == self.fps.maxlen:
+            text += '\n{:.0f} FPS'.format(fps_avg)
 
         img = Image.open(io.BytesIO(self._socket.recv()))
         draw = ImageDraw.Draw(img)
-        draw.text((10, 10),
-                  '{}\n{:.0f} FPS'.format(timestamp, fps_avg),
-                  (255, 106, 0),
-                  font=self._font)
+        draw.text((10, 10), text, (255, 106, 0), font=self._font)
 
         raw = io.BytesIO()
         img.save(raw, format='jpeg')
