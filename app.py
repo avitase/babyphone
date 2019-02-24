@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
+import functools
 import logging
 import os
+import signal
 import time
 from importlib import import_module
 from threading import Thread
@@ -64,12 +66,21 @@ def start_camera_thread():
     return camera, thread
 
 
+def exit_gracefully(signum, frame, camera, thread):
+    camera.stop()
+    thread.join()
+
+
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
-    start_camera_thread()
+    camera, thread = start_camera_thread()
+
+    do_exit = functools.partial(exit_gracefully, camera=camera, thread=thread)
+    signal.signal(signal.SIGINT, do_exit)
+    signal.signal(signal.SIGTERM, do_exit)
 
 if __name__ == '__main__':
     camera, thread = start_camera_thread()
