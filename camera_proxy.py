@@ -19,7 +19,7 @@ class CameraProxy(object):
 
         img = Image.open(io.BytesIO(self._socket.recv()))
         draw = ImageDraw.Draw(img)
-        draw.text((10, 10), timestamp, (255, 255, 255), font=self._font)
+        draw.text((10, 10), timestamp, (255, 106, 0), font=self._font)
 
         raw = io.BytesIO()
         img.save(raw, format='jpeg')
