@@ -1,4 +1,3 @@
-import datetime
 import io
 import time
 
@@ -14,21 +13,19 @@ class Camera(BaseCamera):
         self._camera = picamera.PiCamera()
         self._camera.resolution = (640, 480)
         self._camera.rotation = 180
-        self._camera.annotate_background = picamera.Color('black')
 
         # give camera 2 seconds to configure
         time.sleep(2)
 
+        self._stream = io.BytesIO()
+        self._iter = self._camera.capture_continuous(self._stream, 'jpeg', use_video_port=True)
+
     def next_frame(self):
-        stream = io.BytesIO()
-        for _ in self._camera.capture_continuous(stream, 'jpeg', use_video_port=True):
-            # update timestamp
-            self._camera.annotate_text = datetime.datetime.now().strftime('%H:%M:%S')
+        next(self._iter)
 
-            # return current frame
-            stream.seek(0)
-            yield stream.read()
+        self._stream.seek(0)
+        img = self._stream.read()
 
-            # reset stream for next frame
-            stream.seek(0)
-            stream.truncate()
+        self._stream.seek(0)
+        self._stream.truncate()
+        return img
