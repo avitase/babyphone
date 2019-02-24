@@ -27,8 +27,8 @@ def index():
 
 
 def generate_frame(camera, fps):
-    now = time.time()
-    t = now
+    now = time.time
+    t = now()
 
     while True:
         frame = camera.get_frame()
@@ -36,10 +36,10 @@ def generate_frame(camera, fps):
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-        dt = 1. / float(fps) - (now - t)
+        dt = 1. / float(fps) - (now() - t)
         if dt > 0.:
             time.sleep(dt)
-        t = now
+        t = now()
 
 
 @app.route('/video_feed')
