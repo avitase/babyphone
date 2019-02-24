@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import logging
 import os
 import time
 from importlib import import_module
@@ -53,13 +54,25 @@ def video_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-if __name__ == '__main__':
+def start_camera_thread():
     default_socket = 'ipc:///tmp/camera.socket'
     camera = Camera(socket=app.config.get('CAMERA_SOCKET', default_socket))
     thread = Thread(target=camera.run)
 
     app.logger.info('Starting camera thread')
     thread.start()
+    return camera, thread
+
+
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
+
+    start_camera_thread()
+
+if __name__ == '__main__':
+    camera, thread = start_camera_thread()
 
     app.run(host='0.0.0.0', threaded=True)
 
