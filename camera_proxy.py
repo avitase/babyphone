@@ -10,7 +10,7 @@ class CameraProxy(object):
         self._context = zmq.Context()
         self._socket = self._context.socket(zmq.REQ)
         self._socket.connect(socket)
-        self._font = ImageFont.truetype("/usr/share/fonts/dejavu/DejaVuSans.ttf", 16)
+        self._font = ImageFont.truetype('/usr/share/fonts/dejavu/DejaVuSans.ttf', 16)
 
     def get_frame(self):
         self._socket.send_string('')
