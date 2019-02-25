@@ -1,22 +1,12 @@
 #!/usr/bin/env python
 
-import functools
 import logging
-import os
-import signal
 import time
-from importlib import import_module
-from threading import Thread
 
 from flask import Flask, render_template, Response
 
+import settings_camera
 from camera_proxy import CameraProxy
-
-# import camera driver
-if os.environ.get('CAMERA'):
-    Camera = import_module('camera_' + os.environ['CAMERA']).Camera
-else:
-    from camera_test import Camera
 
 app = Flask(__name__)
 
@@ -48,27 +38,11 @@ def generate_frame(camera, fps):
 @app.route('/video_feed')
 def video_feed():
     default_FPS = 10
-    default_socket = 'ipc:///tmp/camera.socket'
 
-    camera_proxy = CameraProxy(socket=app.config.get('CAMERA_SOCKET', default_socket))
+    camera_proxy = CameraProxy(socket=settings_camera.CAMERA_SOCKET)
     return Response(generate_frame(camera=camera_proxy,
                                    fps=app.config.get('FPS', default_FPS)),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-def start_camera_thread():
-    default_socket = 'ipc:///tmp/camera.socket'
-    camera = Camera(socket=app.config.get('CAMERA_SOCKET', default_socket))
-    thread = Thread(target=camera.run)
-
-    app.logger.info('Starting camera thread')
-    thread.start()
-    return camera, thread
-
-
-def exit_gracefully(signum, frame, camera, thread):
-    camera.stop()
-    thread.join()
 
 
 if __name__ != '__main__':
@@ -76,16 +50,5 @@ if __name__ != '__main__':
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
-    camera, thread = start_camera_thread()
-
-    do_exit = functools.partial(exit_gracefully, camera=camera, thread=thread)
-    signal.signal(signal.SIGINT, do_exit)
-    signal.signal(signal.SIGTERM, do_exit)
-
 if __name__ == '__main__':
-    camera, thread = start_camera_thread()
-
     app.run(host='0.0.0.0', threaded=True)
-
-    camera.stop()
-    thread.join()

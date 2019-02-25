@@ -1,0 +1,1 @@
+CAMERA_SOCKET = 'ipc:///tmp/camera.socket'
