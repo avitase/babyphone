@@ -40,8 +40,10 @@ class CameraProxy(object):
         if len(self.fps) == self.fps.maxlen:
             fps_avg = sum(self.fps) / len(self.fps)
             fps_std = np.sqrt(sum([(fps - fps_avg) ** 2 for fps in self.fps]) / (float(len(self.fps)) - 1.))
-            fps = uncertainties.ufloat(fps_avg, fps_std)
-            text += '\nFPS: {}±{}'.format(*(str(fps).split('+/-')))
+
+            n, s = str(uncertainties.ufloat(fps_avg, fps_std)).split('+/-')
+            s = s.lstrip('0.').lstrip('0')
+            text += '\nFPS: {}({})'.format(n, s)
 
         try:
             img = Image.open(io.BytesIO(self._socket.recv()))
