@@ -1,6 +1,6 @@
 [Unit]
 Description=Gunicorn instance to serve babyphone
-After=network.target camera_server.service
+After=network.target
 
 [Service]
 User=pi
