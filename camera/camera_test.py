@@ -3,7 +3,7 @@ import io
 import numpy as np
 from PIL import Image
 
-from base_camera import BaseCamera
+from camera.base_camera import BaseCamera
 
 
 class Camera(BaseCamera):

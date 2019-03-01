@@ -8,4 +8,6 @@ numpy==1.16.1
 picamera==1.13
 Pillow==5.4.1
 pyzmq==17.1.2
+uncertainties==3.0.3
+uncertainties==3.0.3
 Werkzeug==0.14.1

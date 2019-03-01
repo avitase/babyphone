@@ -1,13 +1,14 @@
 [Unit]
 Description=Gunicorn instance to serve babyphone
-After=network.target
+After=network.target camera_server.service
 
 [Service]
 User=pi
 Group=pi
 WorkingDirectory=/home/pi/babyphone
 Environment="PATH=/home/pi/babyphone/venv/bin"
-ExecStart=/home/pi/babyphone/venv/bin/gunicorn --threads 3 --workers 1 --log-level=error --bind unix:/tmp/babyphone.sock -m 007 app:app
+ExecStart=/home/pi/babyphone/venv/bin/gunicorn --threads 4 --workers 2 --log-level=warning --bind 0.0.0.0:8080 app:app
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
