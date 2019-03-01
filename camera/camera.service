@@ -1,0 +1,14 @@
+[Unit]
+Description=Camera server instance to serve frames via ZMQ
+After=network.target
+
+[Service]
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/babyphone
+Environment="PATH=/home/pi/babyphone/venv/bin"
+ExecStart=/home/pi/babyphone/venv/bin/python camera/server.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
