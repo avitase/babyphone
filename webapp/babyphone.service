@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=pi
 Group=pi
-WorkingDirectory=/home/pi/babyphone
+WorkingDirectory=/home/pi/babyphone/webapp
 Environment="PATH=/home/pi/babyphone/venv/bin"
 ExecStart=/home/pi/babyphone/venv/bin/gunicorn --threads 4 --workers 2 --log-level=warning --bind 0.0.0.0:8080 app:app
 Restart=always

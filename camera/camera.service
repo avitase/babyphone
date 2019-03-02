@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=pi
 Group=pi
-WorkingDirectory=/home/pi/babyphone
+WorkingDirectory=/home/pi/babyphone/camera
 Environment="PATH=/home/pi/babyphone/venv/bin"
 ExecStart=/home/pi/babyphone/venv/bin/python camera/server.py
 Restart=always
