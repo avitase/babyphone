@@ -3,12 +3,12 @@ import os
 import signal
 from importlib import import_module
 
-from camera import settings
+import settings
 
 if os.environ.get('CAMERA'):
     Camera = import_module('camera_' + os.environ['CAMERA']).Camera
 else:
-    from camera.camera_test import Camera
+    from camera_test import Camera
 
 
 def exit_gracefully(signum, frame, camera):

@@ -5,8 +5,8 @@ import time
 
 from flask import Flask, render_template, Response
 
-from camera import settings
-from webapp.camera_proxy import CameraProxy
+import settings
+from camera_proxy import CameraProxy
 
 app = Flask(__name__)
 
