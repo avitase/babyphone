@@ -1,0 +1,14 @@
+[Unit]
+Description=Babyphone Telegram Bot
+After=network.target 
+
+[Service]
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/babyphone/telegram-bot
+Environment="PATH=/home/pi/babyphone/telegram-bot/venv/bin"
+ExecStart=/home/pi/babyphone/telegram-bot/venv/bin/python bot.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
