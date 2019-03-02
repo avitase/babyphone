@@ -39,7 +39,7 @@ def generate_frame(camera, fps):
             app.logger.debug('Sleep for: {:.2f}s'.format(dt))
             time.sleep(dt)
         else:
-            app.logger.warning('Video stream is throtteling: dt = {:.2f}s'.format(dt))
+            app.logger.debug('Video stream is throtteling: dt = {:.2f}s'.format(dt))
         t = now()
 
 
