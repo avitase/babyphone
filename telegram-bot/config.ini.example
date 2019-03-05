@@ -1,0 +1,12 @@
+[CREDENTIALS]
+TOKEN = telegram_token
+CHAT_ID = chat_id
+
+[SYSTEM]
+NETIFACE = wlan0
+
+[CAMERA]
+SOCKET = ipc:///tmp/camera.socket
+
+[LOGGING]
+LOG_LEVEL = INFO

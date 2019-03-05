@@ -40,8 +40,9 @@ class MessageHandler(object):
     def callback(self, bot, update):
         msg = update.message
 
-        if msg.chat_id != self.chat_id:
-            logging.warning('Unauthorized access denied for user %d.', update.effective_user.id)
+        if str(msg.chat_id) != str(self.chat_id):
+            logger = logging.getLogger('telegram-bot')
+            logger.warning('Unauthorized access denied for user {}'.format(update.effective_user.id))
             bot.send_message(chat_id=msg.chat_id,
                              text='Sorry, your chat id {} is invalid! '
                                   'This chat is not authorized to use the Babyphone Knecht.'.format(msg.chat_id))
@@ -55,7 +56,8 @@ class MessageHandler(object):
 
     def query_callback(self, bot, update):
         if update.callback_query.message.chat_id != self.chat_id:
-            logging.warning('Unauthorized query callback')
+            logger = logging.getLogger('telegram-bot')
+            logger.warning('Unauthorized query callback')
         else:
             query = CommandFilter.unify(update.callback_query.data)
             self.query_callbacks[query](bot, update)
@@ -82,4 +84,6 @@ class MessageHandler(object):
         return wrapper
 
     def run(self):
+        logger = logging.getLogger('telegram-bot')
+        logger.info('Starting message handler for chat {}'.format(self.chat_id))
         self._updater.start_polling()
