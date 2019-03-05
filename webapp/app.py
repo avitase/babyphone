@@ -18,7 +18,7 @@ config.read('config.ini')
 
 config_get = lambda sec, key, fllbck: config[sec].get(key, fllbck) if sec in config else fllbck
 app.config['CAMERA_FPS'] = int(config_get('CAMERA', 'FPS', '10'))
-app.config['CAMERA_SOCKET'] = config_get('CAMERA', 'CAMERA_SOCKET', 'ipc:///tmp/camera.socket')
+app.config['CAMERA_SOCKET'] = config_get('CAMERA', 'SOCKET', 'ipc:///tmp/camera.socket')
 
 
 @app.route('/')
