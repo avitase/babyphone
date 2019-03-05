@@ -1,17 +1,24 @@
 #!/usr/bin/env python
 
+import configparser
 import logging
 import time
 
 from flask import Flask, render_template, Response
 
-import settings
 from camera_proxy import CameraProxy
 
 app = Flask(__name__)
 
 # Load settings from 'settings.py'
 app.config.from_object('settings')
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+config_get = lambda sec, key, fllbck: config[sec].get(key, fllbck) if sec in config else fllbck
+app.config['CAMERA_FPS'] = int(config_get('CAMERA', 'FPS', '10'))
+app.config['CAMERA_SOCKET'] = config_get('CAMERA', 'CAMERA_SOCKET', 'ipc:///tmp/camera.socket')
 
 
 @app.route('/')
@@ -47,11 +54,12 @@ def generate_frame(camera, fps):
 def video_feed():
     app.logger.debug('New request for /video_feed')
 
-    default_FPS = 10
+    socket = app.config['CAMERA_SOCKET']
+    fps = app.config['CAMERA_FPS']
+    app.logger.debug('Creating new camera proxy that connects to \'{}\' and limit FPS by {}'.format(socket, fps))
 
-    camera_proxy = CameraProxy(socket=settings.CAMERA_SOCKET)
-    return Response(generate_frame(camera=camera_proxy,
-                                   fps=app.config.get('FPS', default_FPS)),
+    camera_proxy = CameraProxy(socket=socket)
+    return Response(generate_frame(camera=camera_proxy, fps=fps),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
