@@ -1,3 +1,6 @@
 [CAMERA]
 CAMERA_SOCKET = ipc:///tmp/camera.socket
 MAX_FPS = 40
+
+[LOGGING]
+LOG_LEVEL = INFO
