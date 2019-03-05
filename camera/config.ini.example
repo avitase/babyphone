@@ -1,5 +1,5 @@
 [CAMERA]
-CAMERA_SOCKET = ipc:///tmp/camera.socket
+SOCKET = ipc:///tmp/camera.socket
 MAX_FPS = 40
 
 [LOGGING]

@@ -40,7 +40,7 @@ if __name__ == '__main__':
     logger = init_logger(log_level)
     logger.info('Setting log level to {}'.format(log_level))
 
-    socket = config_get('CAMERA', 'CAMERA_SOCKET', 'ipc:///tmp/camera.socket')
+    socket = config_get('CAMERA', 'SOCKET', 'ipc:///tmp/camera.socket')
     max_fps = int(config_get('CAMERA', 'MAX_FPS', '40'))
     logger.info('Connecting camera to \'{}\' and limit FPS by {}'.format(socket, max_fps))
     camera = Camera(socket=socket, max_fps=max_fps)
