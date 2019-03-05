@@ -1,0 +1,3 @@
+[CAMERA]
+CAMERA_SOCKET = ipc:///tmp/camera.socket
+MAX_FPS = 40

@@ -7,8 +7,8 @@ from base_camera import BaseCamera
 
 
 class Camera(BaseCamera):
-    def __init__(self, socket):
-        super(Camera, self).__init__(socket)
+    def __init__(self, socket, max_fps):
+        super(Camera, self).__init__(socket, max_fps)
 
     def rnd_img(width, height):
         vec = np.repeat(np.random.rand(width * height) * 255, 3)

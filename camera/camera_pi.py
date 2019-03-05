@@ -7,12 +7,13 @@ from base_camera import BaseCamera
 
 
 class Camera(BaseCamera):
-    def __init__(self, socket):
-        super(Camera, self).__init__(socket)
+    def __init__(self, socket, max_fps):
+        super(Camera, self).__init__(socket, max_fps)
 
         self._camera = picamera.PiCamera()
         self._camera.resolution = (640, 480)
         self._camera.rotation = 180
+        self._framerate = max_fps
 
         # give camera 2 seconds to configure
         time.sleep(2)

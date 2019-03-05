@@ -4,8 +4,8 @@ import zmq
 
 
 class BaseCamera(object):
-    def __init__(self, socket):
-        self.MAX_FPS = 40
+    def __init__(self, socket, max_fps):
+        self.MAX_FPS = max_fps
 
         context = zmq.Context()
         self._socket = context.socket(zmq.REP)
