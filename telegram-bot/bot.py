@@ -16,6 +16,8 @@ from message_handler import MessageHandler
 config = configparser.ConfigParser()
 config.read('config.ini')
 
+logger = logging.getLogger('telegram-bot')
+
 
 class Commands(Enum):
     START = 1
@@ -55,7 +57,6 @@ def emojize(idx):
 
 @mh.register_callback(str(Commands.START))
 def handle_cmd_start(bot, update):
-    logger = logging.getLogger('telegram-bot')
     logger.info('Processing command /start')
 
     emoji = emojize('wave')
@@ -75,7 +76,6 @@ def handle_cmd_start(bot, update):
 
 @mh.register_callback(str(Commands.VIDEO_STREAM))
 def handle_cmd_video_stream(bot, update):
-    logger = logging.getLogger('telegram-bot')
     logger.info('Processing command VIDEO_STREAM')
 
     interface = config['SYSTEM']['NET_INTERFACE']
@@ -90,7 +90,6 @@ def handle_cmd_video_stream(bot, update):
 
 @mh.register_callback(str(Commands.SNAPSHOT))
 def handle_cmd_snapshot_stream(bot, update):
-    logger = logging.getLogger('telegram-bot')
     logger.info('Processing command SNAPSHOT')
 
     context = zmq.Context()
@@ -141,7 +140,6 @@ def handle_cmd_snapshot_stream(bot, update):
 
 @mh.register_callback(str(Commands.STATS))
 def handle_cmd_stats(bot, update):
-    logger = logging.getLogger('telegram-bot')
     logger.info('Processing command STATS')
 
     uptime = os.popen('/usr/bin/uptime -p').read().lstrip('up').strip()
@@ -158,7 +156,6 @@ def make_inline_keyboard(labels, callback_data):
 
 @mh.register_callback(str(Commands.SHUTDOWN))
 def handle_cmd_shutdown(bot, update):
-    logger = logging.getLogger('telegram-bot')
     logger.info('User %d requested shutdown.', update.effective_user.id)
 
     buttons = make_inline_keyboard(['Confirm', 'Abort'], ['confirm_shutdown', 'abort_shutdown'])
@@ -170,7 +167,6 @@ def handle_cmd_shutdown(bot, update):
 
 @mh.register_callback(str(Commands.REBOOT))
 def handle_cmd_reboot(bot, update):
-    logger = logging.getLogger('telegram-bot')
     logger.info('User %d requested reboot.', update.effective_user.id)
 
     buttons = make_inline_keyboard(['Confirm', 'Abort'], ['confirm_reboot', 'abort_reboot'])
@@ -182,7 +178,6 @@ def handle_cmd_reboot(bot, update):
 
 @mh.register_query_callback('confirm_shutdown')
 def handle_query_confirm_shutdown(bot, update):
-    logger = logging.getLogger('telegram-bot')
     logger.info('User %d confirmed shutdown.', update.effective_user.id)
 
     os.system('/usr/bin/sudo shutdown -h now')
@@ -190,13 +185,11 @@ def handle_query_confirm_shutdown(bot, update):
 
 @mh.register_query_callback('abort_shutdown')
 def handle_query_abort_shutdown(bot, update):
-    logger = logging.getLogger('telegram-bot')
     logger.info('User %d aborted shutdown.', update.effective_user.id)
 
 
 @mh.register_query_callback('confirm_reboot')
 def handle_query_confirm_reboot(bot, update):
-    logger = logging.getLogger('telegram-bot')
     logger.info('User %d confirmed reboot.', update.effective_user.id)
 
     os.system('/usr/bin/sudo reboot')
@@ -204,12 +197,10 @@ def handle_query_confirm_reboot(bot, update):
 
 @mh.register_query_callback('abort_reboot')
 def handle_query_abort_reboot(bot, update):
-    logger = logging.getLogger('telegram-bot')
     logger.info('User %d aborted reboot.', update.effective_user.id)
 
 
 def init_logger(log_level):
-    logger = logging.getLogger('telegram-bot')
     logger.setLevel(log_level)
 
     handler = logging.StreamHandler()
