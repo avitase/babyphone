@@ -12,6 +12,7 @@ import telegram
 import zmq
 
 from message_handler import MessageHandler
+from zmqchain import ZMQChain, ZMQFailureChain
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -55,6 +56,13 @@ def emojize(idx):
     return emoji.emojize(':{}:'.format(idx.strip(':')), use_aliases=True)
 
 
+def fail(bot, update, error_msg):
+    emoji = emojize('dizzy_face')
+    bot.send_message(chat_id=update.message.chat_id,
+                     text='Oh snap! {} {}'.format(error_msg, emoji),
+                     parse_mode=telegram.ParseMode.MARKDOWN)
+
+
 @mh.register_callback(str(Commands.START))
 def handle_cmd_start(bot, update):
     logger.info('Processing command /start')
@@ -78,14 +86,24 @@ def handle_cmd_start(bot, update):
 def handle_cmd_video_stream(bot, update):
     logger.info('Processing command VIDEO_STREAM')
 
-    interface = config['SYSTEM']['NET_INTERFACE']
-    ip = netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
-    port = '8080'
-    url = '{}:{}/'.format(ip, port)
-    emoji = emojize('computer')
-    bot.send_message(chat_id=update.message.chat_id,
-                     text='The Video live stream is available at [{}]({}) {}'.format(url, url, emoji),
-                     parse_mode=telegram.ParseMode.MARKDOWN)
+    error_msg = 'Could not figure out URL of video stream'
+    interface = config['SYSTEM'].get('NETIFACE', None)
+    if interface is None:
+        logger.error('Invalid config property: \'NETIFACE\' was not set')
+        fail(bot, update, error_msg)
+    else:
+        try:
+            ip = netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
+        except ValueError:
+            logger.error('Invalid config property: interface referenced in \'NETIFACE\' does not exist')
+            fail(bot, update, error_msg)
+        else:
+            port = '8080'
+            url = '{}:{}/'.format(ip, port)
+            emoji = emojize('computer')
+            bot.send_message(chat_id=update.message.chat_id,
+                             text='The Video live stream is available at [{}]({}) {}'.format(url, url, emoji),
+                             parse_mode=telegram.ParseMode.MARKDOWN)
 
 
 @mh.register_callback(str(Commands.SNAPSHOT))
@@ -98,44 +116,20 @@ def handle_cmd_snapshot_stream(bot, update):
     timeout_in_ms = 1000
     socket.setsockopt(zmq.RCVTIMEO, timeout_in_ms)
 
-    def fail():
-        emoji = emojize('dizzy_face')
-        bot.send_message(chat_id=update.message.chat_id,
-                         text='Oh snap! Could not receive snapshot {}'.format(emoji),
-                         parse_mode=telegram.ParseMode.MARKDOWN)
+    addr = config['CAMERA'].get('SOCKET', None)
+    chain = ZMQChain() if addr is not None else ZMQFailureChain('Invalid config property: \'SOCKET\' was not set')
+    chain = chain \
+        .then(socket.connect, addr) \
+        .then(socket.send_string, '') \
+        .then(socket.recv)
+    binary_img = chain.value
 
-    socket_str = config['CAMERA'].get('SOCKET', None)
-    if socket_str is None:
-        logger.error('Invalid config property: \'SOCKET\' was not set')
-        fail()
-        return
-
-    logger.debug('Connecting to camera socket \'{}\''.format(socket_str))
-    try:
-        socket.connect(socket_str)
-    except zmq.ZMQError:
-        logger.error('Could not connect to camera socket \'{}\''.format(socket_str))
-        fail()
-        return
-
-    logger.debug('Sending empty to string to camera')
-    try:
-        socket.send_string('')
-    except zmq.ZMQError:
-        logger.error('Could not send empty string')
-        fail()
-        return
-
-    logger.debug('Waiting for response from camera')
-    try:
-        binary_img = socket.recv()
-    except zmq.ZMQError:
-        logger.error('Failure during receiving image from camera socket')
-        fail()
-        return
-
-    logger.debug('Received bytes from camera')
-    bot.send_photo(chat_id=update.message.chat_id, photo=io.BytesIO(binary_img))
+    if binary_img:
+        logger.debug('Received bytes from camera')
+        bot.send_photo(chat_id=update.message.chat_id, photo=io.BytesIO(binary_img))
+    else:
+        logger.error(chain.error_msg)
+        fail(bot, update, 'Could not receive snapshot')
 
 
 @mh.register_callback(str(Commands.STATS))
