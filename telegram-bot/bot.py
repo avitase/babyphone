@@ -101,7 +101,7 @@ def handle_cmd_snapshot_stream(bot, update):
     def fail():
         emoji = emojize('dizzy_face')
         bot.send_message(chat_id=update.message.chat_id,
-                         text='An error occurred. Could not receive snapshot {}'.format(emoji),
+                         text='Oh snap! Could not receive snapshot {}'.format(emoji),
                          parse_mode=telegram.ParseMode.MARKDOWN)
 
     socket_str = config['CAMERA'].get('SOCKET', None)
