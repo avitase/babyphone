@@ -6,9 +6,9 @@ import signal
 from importlib import import_module
 
 if os.environ.get('CAMERA'):
-    Camera = import_module('camera_' + os.environ['CAMERA']).Camera
+    Camera = import_module('camera.camera_' + os.environ['CAMERA']).Camera
 else:
-    from camera_test import Camera
+    from camera.camera_test import Camera
 
 
 def exit_gracefully(signum, frame, camera):
@@ -32,7 +32,9 @@ def init_logger(log_level):
 
 if __name__ == '__main__':
     config = configparser.ConfigParser()
-    config.read('config.ini')
+    config_file = os.environ['CONFIG'] if os.environ.get('CONFIG') else 'config.ini'
+    assert os.path.isfile(config_file), 'config file \'{}\' does not exists'.format(config_file)
+    config.read(config_file)
 
     config_get = lambda sec, key, fllbck: config[sec].get(key, fllbck) if sec in config else fllbck
 

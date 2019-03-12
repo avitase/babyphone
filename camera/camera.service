@@ -8,7 +8,8 @@ Group=pi
 WorkingDirectory=/home/pi/babyphone/camera
 Environment="PATH=/home/pi/babyphone/camera/venv/bin"
 Environment="CAMERA=pi"
-ExecStart=/home/pi/babyphone/camera/venv/bin/python server.py
+Environment="CONFIG=/home/pi/babyphone/camera/config.ini"
+ExecStart=/home/pi/babyphone/camera/venv/bin/python -m camera
 Restart=always
 
 [Install]
